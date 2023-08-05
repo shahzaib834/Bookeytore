@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma.service';
 import { Member } from '@prisma/client';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
+import * as moment from "moment";
 
 @Injectable()
 export class MembersService {
@@ -65,5 +66,19 @@ export class MembersService {
       where: { id },
       data: { name, email },
     });
+  }
+
+  async addMonthlySubscription(id: number) {
+    let currentDate = moment();
+    let nextMonth = moment(currentDate).add(1, 'M').toDate();
+    await this.prisma.member.update({
+      where: {
+        id
+      },
+      data: {
+        isMonthlySubscribed: true,
+        monthlySubscriptionEndDate: nextMonth
+      }
+    })
   }
 }

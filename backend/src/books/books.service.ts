@@ -1,8 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Book } from '@prisma/client';
+import { Book, Member } from '@prisma/client';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { RentBookDto } from './dto/rent-book.dto';
 
 @Injectable()
 export class BooksService {
@@ -22,12 +28,13 @@ export class BooksService {
   }
 
   createBook(createTaskDto: CreateBookDto): Promise<Book | null> {
-    const { title, description } = createTaskDto;
+    const { title, description, rentFee } = createTaskDto;
 
     return this.prisma.book.create({
       data: {
         title,
         description,
+        rentFee
       },
     });
   }
@@ -66,5 +73,60 @@ export class BooksService {
       where: { id },
       data: { title, description },
     });
+  }
+
+  async rentBook(
+    rentBookDto: RentBookDto
+  ): Promise<{ success: boolean; message: string } | null> {
+    try {
+      const { memberId, bookId } = rentBookDto;
+
+      if (!memberId || !bookId) {
+        throw new BadRequestException('BookId or memberId missing!');
+      }
+
+      // Check if already rented and return error
+      // also check if member is a defaulter and return error
+
+      await this.prisma.book.update({
+        where: {
+          id: bookId,
+        },
+        data: {
+          status: 'RENTED',
+        },
+      });
+
+      await this.prisma.rentedBooks.create({
+        data: {
+          bookId,
+          memberId,
+        },
+      });
+      return { success: true, message: 'Book rented succesfully' };
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException('Something went wrong!');
+    }
+  }
+
+  async returnRentedBook(
+    id: number
+  ): Promise<{ success: boolean; message: string } | null> {
+    try {
+      await this.prisma.book.update({
+        where: {
+          id,
+        },
+        data: {
+          status: 'AVAILABLE',
+        },
+      });
+
+      return { success: true, message: 'Unrented Successfully' };
+    } catch (err) {
+      console.log(err);
+      throw new InternalServerErrorException('Something went wrong!');
+    }
   }
 }

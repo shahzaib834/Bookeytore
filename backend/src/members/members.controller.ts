@@ -48,4 +48,9 @@ export class MembersController {
   deleteMemberById(@Param('id', ParseIntPipe) id: number) {
     return this.membersService.deleteMemberById(id);
   }
+
+  @Post(':id/add-monthly-sub')
+  addMonthlySubscription(@Param('id', ParseIntPipe) id: number) {
+    return this.membersService.addMonthlySubscription(id);
+  }
 }
