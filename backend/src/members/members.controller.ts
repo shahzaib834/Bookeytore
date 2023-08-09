@@ -27,7 +27,7 @@ export class MembersController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  createTask(@Body() createMemberDto: CreateMemberDto): Promise<Member | null> {
+  createMember(@Body() createMemberDto: CreateMemberDto): Promise<Member | null> {
     return this.membersService.createMember(createMemberDto);
   }
 

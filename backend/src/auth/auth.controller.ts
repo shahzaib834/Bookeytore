@@ -27,7 +27,9 @@ export class AuthController {
 
   @Post('signup')
   @UsePipes(ValidationPipe)
-  async signUp(@Body() createUserDto: CreateUserDto): Promise<{user: User | null, accessToken: string}> {
+  async signUp(
+    @Body() createUserDto: CreateUserDto
+  ): Promise<{ user: User | null; accessToken: string }> {
     return this.authService.signUp(createUserDto);
   }
 
@@ -35,7 +37,7 @@ export class AuthController {
   @UsePipes(ValidationPipe)
   async signIn(
     @Body() body: { username: string; password: string }
-  ): Promise<string> {
+  ): Promise<{ success: boolean; token: string }> {
     return this.authService.signIn(body);
   }
 

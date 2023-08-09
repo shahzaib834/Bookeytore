@@ -1,9 +1,18 @@
 import { BiLogOutCircle } from 'react-icons/bi';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
+import useUserAuth from '../hooks/useUserAuth';
 
 const RootLayout = () => {
-  const handleLogout = () => {};
+  const navigate = useNavigate();
 
+  const handleLogout = () => {
+    userContext.setUserAuth(false, {});
+    localStorage.setItem('userAuth', 'false');
+    localStorage.setItem('user', JSON.stringify({}));
+    navigate('/login');
+  };
+
+  const userContext = useUserAuth();
   return (
     <>
       <div className='flex justify-around p-2 border-b-2 border-red-300'>

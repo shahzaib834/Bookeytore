@@ -3,13 +3,16 @@ import { create } from 'zustand';
 interface UserAuthStore {
   userAuth: boolean;
   user: {};
-  setUserAuth: (isUser: boolean, user: {}) => void;
+  token: string;
+  setUserAuth: (isUser: boolean, user: {}, token: string) => void;
 }
 
 const useUserAuth = create<UserAuthStore>((set) => ({
   userAuth: false,
   user: {},
-  setUserAuth: (isUser: boolean, user: {}) => set({ userAuth: isUser, user }),
+  token: '',
+  setUserAuth: (isUser: boolean, user: {}, token: string) =>
+    set({ userAuth: isUser, user, token }),
 }));
 
 export default useUserAuth;

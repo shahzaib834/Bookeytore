@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useUserAuth from '../hooks/useUserAuth';
 import { useNavigate } from 'react-router-dom';
+import { postData } from '../api/POST';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -8,13 +9,21 @@ const Login = () => {
   const userContext = useUserAuth();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // For testing
+  const handleLogin = async () => {
     const user = {
-      name: 'shahzaib',
+      username: email,
+      password,
     };
-    userContext.setUserAuth(true, user);
-    navigate('/');
+    const response = await postData('auth/login', user);
+
+    if (response?.success) {
+      userContext.setUserAuth(true, { name: 'test' }, response?.token);
+      localStorage.setItem('userAuth', 'true');
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', response.token);
+
+      navigate('/');
+    }
   };
   return (
     <div className='absolute left-[50%] top-[50%] border p-5 translate-x-[-50%] translate-y-[-50%] w-[50vw] h-[50vh]'>

@@ -23,7 +23,7 @@ import { RentBookDto } from './dto/rent-book.dto';
 export class BooksController {
   constructor(private booksService: BooksService) {}
 
-  @UseGuards(AuthGuard)
+  // @UseGuards(AuthGuard)
   @Get()
   getAllBooks(@Query() query: { filter: string }): Promise<Book[] | null> {
     return this.booksService.getAllBooks(query);

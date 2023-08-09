@@ -12,11 +12,13 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const config_1 = require("@nestjs/config");
 const books_module_1 = require("./books/books.module");
+const members_module_1 = require("./members/members.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [config_1.ConfigModule.forRoot(), books_module_1.BooksModule],
+        imports: [config_1.ConfigModule.forRoot(), books_module_1.BooksModule, members_module_1.MembersModule, auth_module_1.AuthModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

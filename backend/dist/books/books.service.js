@@ -29,11 +29,12 @@ let BooksService = exports.BooksService = class BooksService {
         });
     }
     createBook(createTaskDto) {
-        const { title, description } = createTaskDto;
+        const { title, description, rentFee } = createTaskDto;
         return this.prisma.book.create({
             data: {
                 title,
                 description,
+                rentFee
             },
         });
     }
@@ -63,6 +64,50 @@ let BooksService = exports.BooksService = class BooksService {
             where: { id },
             data: { title, description },
         });
+    }
+    async rentBook(rentBookDto) {
+        try {
+            const { memberId, bookId } = rentBookDto;
+            if (!memberId || !bookId) {
+                throw new common_1.BadRequestException('BookId or memberId missing!');
+            }
+            await this.prisma.book.update({
+                where: {
+                    id: bookId,
+                },
+                data: {
+                    status: 'RENTED',
+                },
+            });
+            await this.prisma.rentedBooks.create({
+                data: {
+                    bookId,
+                    memberId,
+                },
+            });
+            return { success: true, message: 'Book rented succesfully' };
+        }
+        catch (err) {
+            console.log(err);
+            throw new common_1.InternalServerErrorException('Something went wrong!');
+        }
+    }
+    async returnRentedBook(id) {
+        try {
+            await this.prisma.book.update({
+                where: {
+                    id,
+                },
+                data: {
+                    status: 'AVAILABLE',
+                },
+            });
+            return { success: true, message: 'Unrented Successfully' };
+        }
+        catch (err) {
+            console.log(err);
+            throw new common_1.InternalServerErrorException('Something went wrong!');
+        }
     }
 };
 exports.BooksService = BooksService = __decorate([

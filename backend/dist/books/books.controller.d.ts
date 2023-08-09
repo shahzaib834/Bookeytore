@@ -2,6 +2,7 @@ import { BooksService } from './books.service';
 import { Book } from '@prisma/client';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { RentBookDto } from './dto/rent-book.dto';
 export declare class BooksController {
     private booksService;
     constructor(booksService: BooksService);
@@ -15,5 +16,17 @@ export declare class BooksController {
         id: number;
         title: string;
         description: string;
+        status: import(".prisma/client").BookStatus;
+        rentFee: number;
+        createdAt: Date;
+        updatedAt: Date;
     }, unknown> & {}>;
+    rentABook(rentBookDto: RentBookDto): Promise<{
+        success: boolean;
+        message: string;
+    } | null>;
+    returnRentedBook(id: number): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

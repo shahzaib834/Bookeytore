@@ -22,4 +22,8 @@ __decorate([
     (0, class_validator_1.IsNotEmpty)(),
     __metadata("design:type", String)
 ], CreateBookDto.prototype, "description", void 0);
+__decorate([
+    (0, class_validator_1.IsNotEmpty)(),
+    __metadata("design:type", Number)
+], CreateBookDto.prototype, "rentFee", void 0);
 //# sourceMappingURL=create-book.dto.js.map
