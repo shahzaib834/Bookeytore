@@ -14,17 +14,38 @@ import { RentBookDto } from './dto/rent-book.dto';
 export class BooksService {
   constructor(private prisma: PrismaService) {}
 
-  getAllBooks(query: { filter: string }): Promise<Book[] | null> {
-    if (Object.keys(query).length === 0) return this.prisma.book.findMany();
+  getAllBooks(query: {
+    filter: string;
+    page: number;
+    limit: number;
+  }): Promise<Book[] | null> {
+    if (!query.page) query.page = 1;
+    if (!query.limit) query.limit = 10;
+    const skip = query.page * query.limit - query.limit;
 
-    return this.prisma.book.findMany({
-      where: {
-        OR: [
-          { title: { contains: query.filter } },
-          { description: { contains: query.filter } },
-        ],
-      },
-    });
+    if (!query.filter) {
+      return this.prisma.book.findMany({
+        skip,
+        take: query.limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+    } else {
+      return this.prisma.book.findMany({
+        skip,
+        take: query.limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        where: {
+          OR: [
+            { title: { contains: query.filter } },
+            { description: { contains: query.filter } },
+          ],
+        },
+      });
+    }
   }
 
   createBook(createTaskDto: CreateBookDto): Promise<Book | null> {
@@ -34,7 +55,7 @@ export class BooksService {
       data: {
         title,
         description,
-        rentFee
+        rentFee,
       },
     });
   }

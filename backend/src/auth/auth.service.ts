@@ -46,11 +46,15 @@ export class AuthService {
   async signIn(body: { username: string; password: string }) {
     const { username, password } = body;
 
+    if (!username || !password) {
+      throw new UnauthorizedException('username and password is required');
+    }
+
     const user = await this.prisma.user.findFirst({
       where: { username },
     });
 
-    const isAuthenticated = await bcrypt.compare(password, user.password);
+    const isAuthenticated = user && await bcrypt.compare(password, user?.password);
 
     if (!user || !isAuthenticated)
       throw new UnauthorizedException('Wrong name or password');

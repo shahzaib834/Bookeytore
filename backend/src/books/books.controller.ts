@@ -25,13 +25,13 @@ export class BooksController {
 
   // @UseGuards(AuthGuard)
   @Get()
-  getAllBooks(@Query() query: { filter: string }): Promise<Book[] | null> {
+  getAllBooks(@Query() query: { filter: string, page: number, limit: number }): Promise<Book[] | null> {
     return this.booksService.getAllBooks(query);
   }
 
   @Post()
   @UsePipes(ValidationPipe)
-  createTask(@Body(ValidationPipe) createBookDto: CreateBookDto): Promise<Book | null> {
+  createBook(@Body(ValidationPipe) createBookDto: CreateBookDto): Promise<Book | null> {
     return this.booksService.createBook(createBookDto);
   }
 

@@ -5,23 +5,40 @@ import { Book } from '../interfaces/Book';
 import BookTile from '../components/BookTile';
 import { Member } from '../interfaces/Member';
 import MemberTile from '../components/MemberTile';
+import { AiOutlineArrowRight, AiOutlineArrowLeft } from 'react-icons/ai';
 
 const Home = () => {
   const [data, setData] = useState([]);
   const [radioOption, setRadioOption] = useState('books');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+
   const fetchData = async (type: string) => {
-    const response = await getData(type);
+    const response = await getData(type, page);
     setData(response);
-    console.log(response)
+
+    if (response.length < 10) {
+      setTotalPages(page);
+    } else {
+      setTotalPages(page + 1);
+    }
   };
 
   useEffect(() => {
-    fetchData('books');
-  }, []);
+    fetchData(radioOption);
+  }, [page]);
 
   const onStateChange = (e: any) => {
     setRadioOption(e.target.value);
     fetchData(e.target.value);
+  };
+
+  const onNextClick = () => {
+    setPage(page + 1);
+  };
+
+  const onPrevClick = () => {
+    setPage(page - 1);
   };
 
   return (
@@ -38,6 +55,28 @@ const Home = () => {
           : data.map((member: Member) => {
               return <MemberTile key={member.id} member={member} />;
             })}
+      </div>
+
+      <div className='flex justify-end gap-6 mt-2 p-6'>
+        <div
+          className={`flex justify-center items-center gap-1 ${
+            page === 1 ? 'pointer-events-none opacity-60' : 'cursor-pointer'
+          }`}
+          onClick={onPrevClick}
+        >
+          <AiOutlineArrowLeft className='text-red-500' size={25} /> <p>Prev</p>
+        </div>
+        <div
+          className={`flex justify-center items-center gap-1 cursor-pointer ${
+            page >= totalPages
+              ? 'pointer-events-none opacity-60'
+              : 'cursor-pointer'
+          }`}
+          onClick={onNextClick}
+        >
+          <p>Next</p>
+          <AiOutlineArrowRight className='text-red-500' size={25} />
+        </div>
       </div>
     </div>
   );
