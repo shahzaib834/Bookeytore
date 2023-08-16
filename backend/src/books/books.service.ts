@@ -5,10 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { Book, Member } from '@prisma/client';
+import { Book, Member, Prisma } from '@prisma/client';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { RentBookDto } from './dto/rent-book.dto';
+import { AddCommentDto } from './dto/add-comment.dto';
 
 @Injectable()
 export class BooksService {
@@ -30,6 +31,15 @@ export class BooksService {
         orderBy: {
           createdAt: 'desc',
         },
+        include: {
+          comments: {
+            select: {
+              id: true,
+              bookId: true,
+              comment: true,
+            },
+          },
+        },
       });
     } else {
       return this.prisma.book.findMany({
@@ -43,6 +53,15 @@ export class BooksService {
             { title: { contains: query.filter } },
             { description: { contains: query.filter } },
           ],
+        },
+        include: {
+          comments: {
+            select: {
+              id: true,
+              bookId: true,
+              comment: true,
+            },
+          },
         },
       });
     }
@@ -64,6 +83,16 @@ export class BooksService {
     const book = await this.prisma.book.findUnique({
       where: {
         id,
+      },
+      include: {
+        comments: {
+          select: {
+            bookId: true,
+            comment: true,
+            DateTime: true,
+            User: true,
+          },
+        },
       },
     });
 
@@ -148,6 +177,53 @@ export class BooksService {
     } catch (err) {
       console.log(err);
       throw new InternalServerErrorException('Something went wrong!');
+    }
+  }
+
+  async addComment(
+    bookId: number,
+    addCommentDto: AddCommentDto
+  ): Promise<{ success: boolean; message: string } | null> {
+    try {
+      const { comment, username } = addCommentDto;
+
+      if (!comment || !username) {
+        throw new BadRequestException('All required Information not provided');
+      }
+
+      const book = await this.prisma.book.findFirst({
+        where: {
+          id: bookId,
+        },
+      });
+
+      if (!book) {
+        throw new BadRequestException('Book Not Found');
+      }
+
+      await this.prisma.comment.create({
+        data: {
+          comment,
+          userName: username,
+          bookId,
+        },
+      });
+
+      // const jsonComment = [{id: 'randomId', comment, memberId}] as Prisma.JsonArray;
+
+      // await this.prisma.book.update({
+      //   where: {
+      //     id: bookId
+      //   },
+      //   data: {
+      //     comments: jsonComment
+      //   }
+      // });
+
+      return { success: true, message: 'comment added succesfully' };
+    } catch (err) {
+      console.log(err);
+      return { success: false, message: 'comment addition Failed' };
     }
   }
 }

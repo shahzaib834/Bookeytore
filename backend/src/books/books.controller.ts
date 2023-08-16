@@ -18,6 +18,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RentBookDto } from './dto/rent-book.dto';
+import { AddCommentDto } from './dto/add-comment.dto';
 
 @Controller('books')
 export class BooksController {
@@ -25,13 +26,17 @@ export class BooksController {
 
   // @UseGuards(AuthGuard)
   @Get()
-  getAllBooks(@Query() query: { filter: string, page: number, limit: number }): Promise<Book[] | null> {
+  getAllBooks(
+    @Query() query: { filter: string; page: number; limit: number }
+  ): Promise<Book[] | null> {
     return this.booksService.getAllBooks(query);
   }
 
   @Post()
   @UsePipes(ValidationPipe)
-  createBook(@Body(ValidationPipe) createBookDto: CreateBookDto): Promise<Book | null> {
+  createBook(
+    @Body(ValidationPipe) createBookDto: CreateBookDto
+  ): Promise<Book | null> {
     return this.booksService.createBook(createBookDto);
   }
 
@@ -60,8 +65,18 @@ export class BooksController {
     return this.booksService.rentBook(rentBookDto);
   }
 
+  @Post('/:id/comment')
+  addComment(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(ValidationPipe) addCommentDto: AddCommentDto
+  ): Promise<{ success: boolean; message: string } | null> {
+    return this.booksService.addComment(id, addCommentDto);
+  }
+
   @Put('/return-book/:id')
-  returnRentedBook(@Param('id', ParseIntPipe) id: number): Promise<{success: boolean, message: string}> {
+  returnRentedBook(
+    @Param('id', ParseIntPipe) id: number
+  ): Promise<{ success: boolean; message: string }> {
     return this.booksService.returnRentedBook(id);
   }
 }

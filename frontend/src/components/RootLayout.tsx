@@ -6,7 +6,7 @@ const RootLayout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    userContext.setUserAuth(false, {});
+    userContext.setUserAuth(false, { username: '' }, '');
     localStorage.setItem('userAuth', 'false');
     localStorage.setItem('user', JSON.stringify({}));
     navigate('/login');

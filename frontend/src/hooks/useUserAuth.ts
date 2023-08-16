@@ -2,16 +2,20 @@ import { create } from 'zustand';
 
 interface UserAuthStore {
   userAuth: boolean;
-  user: {};
+  user: { username: string };
   token: string;
-  setUserAuth: (isUser: boolean, user: {}, token: string) => void;
+  setUserAuth: (
+    isUser: boolean,
+    user: { username: string },
+    token: string
+  ) => void;
 }
 
 const useUserAuth = create<UserAuthStore>((set) => ({
   userAuth: false,
-  user: {},
+  user: { username: '' },
   token: '',
-  setUserAuth: (isUser: boolean, user: {}, token: string) =>
+  setUserAuth: (isUser: boolean, user: { username: string }, token: string) =>
     set({ userAuth: isUser, user, token }),
 }));
 

@@ -62,7 +62,7 @@ export class AuthService {
     const payload = { username };
     const accessToken = await this.jwtService.signAsync(payload);
 
-    return { token: accessToken, success: true };
+    return { token: accessToken, success: true, userData: user };
   }
 
   // async uploadFile(imageBuffer: Buffer, fileName: string) {

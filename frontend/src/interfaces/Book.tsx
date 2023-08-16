@@ -4,4 +4,13 @@ export interface Book {
   description: string;
   rentFee: number;
   status: string;
+  comments: [
+    {
+      id: number;
+      comment: string;
+      memberId: number;
+      User: { username: '' };
+      DateTime: '';
+    }
+  ];
 }

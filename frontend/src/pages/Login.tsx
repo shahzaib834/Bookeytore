@@ -17,7 +17,7 @@ const Login = () => {
     const response = await postData('auth/login', user);
 
     if (response?.success) {
-      userContext.setUserAuth(true, { name: 'test' }, response?.token);
+      userContext.setUserAuth(true, response?.userData, response?.token);
       localStorage.setItem('userAuth', 'true');
       localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', response.token);
