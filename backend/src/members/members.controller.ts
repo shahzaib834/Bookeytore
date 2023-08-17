@@ -21,13 +21,17 @@ export class MembersController {
   constructor(private membersService: MembersService) {}
 
   @Get()
-  getAllMembers(@Query() query: { filter: string }): Promise<Member[] | null> {
+  getAllMembers(
+    @Query() query: { filter: string; page: number; limit: number }
+  ): Promise<Member[] | null> {
     return this.membersService.getAllMembers(query);
   }
 
   @Post()
   @UsePipes(ValidationPipe)
-  createMember(@Body() createMemberDto: CreateMemberDto): Promise<Member | null> {
+  createMember(
+    @Body() createMemberDto: CreateMemberDto
+  ): Promise<Member | null> {
     return this.membersService.createMember(createMemberDto);
   }
 

@@ -4,7 +4,7 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=postgres
-    container_name: postgres
+    container_name: postgres_new
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
@@ -15,9 +15,9 @@ services:
 
   api:
     build:
-      context: .
+      context: backend/
       dockerfile: Dockerfile
-    container_name: my_api
+    container_name: my_api_new
     environment:
       - PORT=${PORT}
     ports:
@@ -26,8 +26,16 @@ services:
       - postgres
     env_file:
       - .env
-    volumes:
-      - ./src:/app/src
+
+  fe:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    container_name: CLIENT_NEW
+    environment:
+      - PORT=${PORT}
+    ports:
+      - 5173:5173
 
   # pgadmin:
   #   image: dpage/pgadmin4

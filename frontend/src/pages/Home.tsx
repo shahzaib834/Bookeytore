@@ -46,15 +46,21 @@ const Home = () => {
       <RadioSection radioOption={radioOption} onChange={onStateChange} />
       {/* Filters Here later */}
 
+      {!data.length && (
+        <div className='mt-5 flex justify-center items-center p-2 text-2xl w-full'>
+          Nothing to show!
+        </div>
+      )}
+
       <div className='p-5 grid grid-col-1 sm:grip-col-2 md:grid-col-3 lg:grid-cols-4 xl:grid-cols-4 gap-16'>
-        {radioOption === 'books'
-          ? data &&
-            data.map((book: Book) => {
-              return <BookTile key={book.id} book={book} />;
-            })
-          : data.map((member: Member) => {
-              return <MemberTile key={member.id} member={member} />;
-            })}
+        {data.length &&
+          (radioOption === 'books'
+            ? data?.map((book: Book) => {
+                return <BookTile key={book.id} book={book} />;
+              })
+            : data?.map((member: Member) => {
+                return <MemberTile key={member.id} member={member} />;
+              }))}
       </div>
 
       <div className='flex justify-end gap-6 mt-2 p-6'>

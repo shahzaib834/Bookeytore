@@ -68,13 +68,14 @@ export class BooksService {
   }
 
   createBook(createTaskDto: CreateBookDto): Promise<Book | null> {
-    const { title, description, rentFee } = createTaskDto;
+    const { title, description, rentFee, authorName } = createTaskDto;
 
     return this.prisma.book.create({
       data: {
         title,
         description,
         rentFee,
+        authorName
       },
     });
   }
@@ -87,6 +88,7 @@ export class BooksService {
       include: {
         comments: {
           select: {
+            id: true,
             bookId: true,
             comment: true,
             DateTime: true,

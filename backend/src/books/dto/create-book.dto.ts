@@ -10,4 +10,7 @@ export class CreateBookDto {
 
   @IsNotEmpty()
   rentFee: number;
+
+  @IsNotEmpty()
+  authorName: string;
 }

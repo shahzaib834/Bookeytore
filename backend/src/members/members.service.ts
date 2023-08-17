@@ -3,22 +3,44 @@ import { PrismaService } from '../prisma.service';
 import { Member } from '@prisma/client';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
-import * as moment from "moment";
+import * as moment from 'moment';
 
 @Injectable()
 export class MembersService {
   constructor(private prisma: PrismaService) {}
 
-  getAllMembers(query: { filter: string }): Promise<Member[] | null> {
-    if (Object.keys(query).length === 0) return this.prisma.member.findMany();
+  getAllMembers(query: {
+    filter: string;
+    page: number;
+    limit: number;
+  }): Promise<Member[] | null> {
+    if (!query.page) query.page = 1;
+    if (!query.limit) query.limit = 10;
+    const skip = query.page * query.limit - query.limit;
 
-    return this.prisma.member.findMany({
-      where: {
-        OR: [
-          { name: { contains: query.filter } },
-        ],
-      },
-    });
+    if (!query.filter) {
+      return this.prisma.member.findMany({
+        skip,
+        take: query.limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+    } else {
+      return this.prisma.member.findMany({
+        skip,
+        take: query.limit,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        where: {
+          OR: [
+            { email: { contains: query.filter } },
+            { name: { contains: query.filter } },
+          ],
+        },
+      });
+    }
   }
 
   createMember(createMemberDto: CreateMemberDto): Promise<Member | null> {
@@ -73,12 +95,12 @@ export class MembersService {
     let nextMonth = moment(currentDate).add(1, 'M').toDate();
     await this.prisma.member.update({
       where: {
-        id
+        id,
       },
       data: {
         isMonthlySubscribed: true,
-        monthlySubscriptionEndDate: nextMonth
-      }
-    })
+        monthlySubscriptionEndDate: nextMonth,
+      },
+    });
   }
 }

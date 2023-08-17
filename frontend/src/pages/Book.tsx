@@ -4,14 +4,25 @@ import { getSingleData } from '../api/GET';
 import { Book } from '../interfaces/Book';
 import useUserAuth from '../hooks/useUserAuth';
 import { postData } from '../api/POST';
+import moment from 'moment';
+
+interface Comment {
+  id: number;
+  comment: string;
+  memberId: number;
+  username: string;
+  dateTime: string;
+}
 
 const Book = () => {
   let { id } = useParams();
   const userAuth = useUserAuth();
   const [comment, setComment] = useState('');
+  const [bookComments, setBookComments] = useState([]);
   const [book, setBook] = useState<Book>({
     id: 0,
     title: '',
+    authorName: '',
     description: '',
     rentFee: 0,
     status: '',
@@ -22,10 +33,36 @@ const Book = () => {
   const defaultImage =
     'https://elements-cover-images-0.imgix.net/43a0f94b-abc5-4bc9-98c1-92f72cf03ec0?auto=compress%2Cformat&fit=max&w=1370&s=dfeda277333cef334b9cdddc8d98bcc9';
 
+  const serializeComments = (
+    comments: [
+      {
+        id: string;
+        comment: string;
+        DateTime: string;
+        User: { username: string };
+      }
+    ]
+  ) => {
+    // @ts-ignore
+    let serializedComments = [];
+    comments.map((comment) => {
+      serializedComments.push({
+        id: comment.id,
+        comment: comment.comment,
+        username: comment.User?.username,
+        dateTime: moment(comment.DateTime).format('DD/MM/YYYY hh:mm:ss'),
+      });
+    });
+
+    // @ts-ignore
+    setBookComments(serializedComments);
+  };
+
   const fetchData = async () => {
     const response = await getSingleData('books', id);
     setBook(response);
     console.log(response);
+    serializeComments(response.comments);
   };
 
   useLayoutEffect(() => {
@@ -57,7 +94,7 @@ const Book = () => {
           <p className='text-4xl uppercase font-bold'>{book.title}</p>
           <p className='text-xl font-thin'>{book.description}</p>
           <p className='text-3xl'>{book.rentFee}$</p>
-          <p className='text-2xl'>author later</p>
+          <p className='text-2xl'>{book.authorName}</p>
           <p
             className={`text-2xl ${
               book.status === 'AVAILABLE' ? 'bg-green-900' : 'bg-red-900'
@@ -70,16 +107,16 @@ const Book = () => {
 
       {/* Comments section */}
       <div className='flex flex-col mt-4'>
-        <p className='uppercase text-3xl'>Comments</p>
+        <p className='uppercase text-3xl'>Admin Comments</p>
 
-        {book.comments.length ? (
-          book?.comments?.map((comment) => (
+        {bookComments.length ? (
+          bookComments?.map((comment: Comment) => (
             <div className='flex gap-5 mt-4' key={comment.id}>
-              <p className='text-xl'>{comment.User?.username}</p>
+              <p className='text-xl'>{comment.username}</p>
               <p>-</p>
               <p className='text-lg'>{comment.comment}</p>
               <p>-</p>
-              <p className='text-lg'>{comment.DateTime}</p>
+              <p className='text-lg'>{comment.dateTime}</p>
             </div>
           ))
         ) : (

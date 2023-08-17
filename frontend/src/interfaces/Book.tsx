@@ -2,6 +2,7 @@ export interface Book {
   id: number;
   title: string;
   description: string;
+  authorName: string,
   rentFee: number;
   status: string;
   comments: [
