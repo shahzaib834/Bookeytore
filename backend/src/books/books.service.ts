@@ -51,7 +51,7 @@ export class BooksService {
         where: {
           OR: [
             { title: { contains: query.filter } },
-            { description: { contains: query.filter } },
+            { authorName: { contains: query.filter } },
           ],
         },
         include: {
@@ -68,14 +68,15 @@ export class BooksService {
   }
 
   createBook(createTaskDto: CreateBookDto): Promise<Book | null> {
-    const { title, description, rentFee, authorName } = createTaskDto;
+    const { title, rentedQuantity, stock, rentFee, authorName } = createTaskDto;
 
     return this.prisma.book.create({
       data: {
         title,
-        description,
+        rentedQuantity,
         rentFee,
-        authorName
+        authorName,
+        stock,
       },
     });
   }
@@ -86,6 +87,11 @@ export class BooksService {
         id,
       },
       include: {
+        RentedBooks: {
+          include: {
+            member: true,
+          },
+        },
         comments: {
           select: {
             id: true,
@@ -117,13 +123,14 @@ export class BooksService {
 
   async updateBookById(
     id: number,
-    updateTaskDto: UpdateBookDto
+    updateBookDto: UpdateBookDto
   ): Promise<Book | null> {
-    const { title, description } = updateTaskDto;
+    const { title, authorName, rentFee, rentedQuantity, stock, status } =
+      updateBookDto;
 
     return await this.prisma.book.update({
       where: { id },
-      data: { title, description },
+      data: { title, authorName, rentFee, rentedQuantity, status },
     });
   }
 
@@ -137,15 +144,40 @@ export class BooksService {
         throw new BadRequestException('BookId or memberId missing!');
       }
 
-      // Check if already rented and return error
-      // also check if member is a defaulter and return error
+      const book = await this.prisma.book.findFirst({
+        where: {
+          id: bookId,
+        },
+      });
+
+      if (
+        !book ||
+        book.status === 'ALL_RENTED' ||
+        book.stock <= book.rentedQuantity
+      ) {
+        throw new BadRequestException('Book not found or not available!');
+      }
+
+      const member = await this.prisma.member.findFirst({
+        where: {
+          id: memberId,
+        },
+      });
+
+      if (!member || member.isDefaulter) {
+        throw new BadRequestException(
+          'Member not found or Member is a defaulter!'
+        );
+      }
 
       await this.prisma.book.update({
         where: {
           id: bookId,
         },
         data: {
-          status: 'RENTED',
+          status:
+            book.rentedQuantity + 1 === book.stock ? 'ALL_RENTED' : 'AVAILABLE',
+          rentedQuantity: book.rentedQuantity + 1,
         },
       });
 
@@ -163,17 +195,54 @@ export class BooksService {
   }
 
   async returnRentedBook(
-    id: number
+    bookId: number,
+    memberId: number
   ): Promise<{ success: boolean; message: string } | null> {
     try {
+      const book = await this.prisma.book.findFirst({
+        where: {
+          id: bookId,
+        },
+      });
+
+      if (!book) {
+        throw new BadRequestException('Book not found');
+      }
+
+      const member = await this.prisma.member.findFirst({
+        where: {
+          id: memberId,
+        },
+      });
+
+      if (!member) {
+        throw new BadRequestException('Member not found');
+      }
+
       await this.prisma.book.update({
         where: {
-          id,
+          id: bookId,
         },
         data: {
           status: 'AVAILABLE',
+          rentedQuantity: book.rentedQuantity - 1,
         },
       });
+
+      const rentedBook = await this.prisma.rentedBooks.findFirst({
+        where: {
+          bookId,
+          memberId,
+        },
+      });
+
+      if (rentedBook) {
+        await this.prisma.rentedBooks.delete({
+          where: {
+            id: rentedBook.id,
+          },
+        });
+      }
 
       return { success: true, message: 'Unrented Successfully' };
     } catch (err) {

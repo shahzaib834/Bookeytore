@@ -5,12 +5,11 @@ export class CreateBookDto {
   title: string;
 
   @IsNotEmpty()
-  @MaxLength(300)
-  description: string;
-
-  @IsNotEmpty()
   rentFee: number;
 
   @IsNotEmpty()
   authorName: string;
+
+  rentedQuantity: number;
+  stock: number;
 }

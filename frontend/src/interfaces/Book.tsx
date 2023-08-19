@@ -1,10 +1,12 @@
 export interface Book {
   id: number;
   title: string;
-  description: string;
-  authorName: string,
+  rentedQuantity: number;
+  stock: number;
+  authorName: string;
   rentFee: number;
   status: string;
+  RentedBooks: [];
   comments: [
     {
       id: number;

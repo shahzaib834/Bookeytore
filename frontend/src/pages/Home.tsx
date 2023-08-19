@@ -6,12 +6,17 @@ import BookTile from '../components/BookTile';
 import { Member } from '../interfaces/Member';
 import MemberTile from '../components/MemberTile';
 import { AiOutlineArrowRight, AiOutlineArrowLeft } from 'react-icons/ai';
+import useBookModal from '../hooks/useBookModal';
+import useMemberModal from '../hooks/useMemberModal';
 
 const Home = () => {
   const [data, setData] = useState([]);
   const [radioOption, setRadioOption] = useState('books');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+
+  const bookModal = useBookModal();
+  const memberModal = useMemberModal();
 
   const fetchData = async (type: string) => {
     const response = await getData(type, page);
@@ -45,6 +50,21 @@ const Home = () => {
     <div>
       <RadioSection radioOption={radioOption} onChange={onStateChange} />
       {/* Filters Here later */}
+
+      <div className='flex gap-5 p-5 mt-5 rounded-md justify-center'>
+        <button
+          className='p-2 bg-purple-500 hover:bg-purple-700 text-white rounded-md'
+          onClick={() => bookModal.onOpen()}
+        >
+          Create/Update Book
+        </button>
+        <button
+          className='p-2 bg-purple-500 hover:bg-purple-700 text-white rounded-md'
+          onClick={() => memberModal.onOpen()}
+        >
+          Create/Update Member
+        </button>
+      </div>
 
       {!data.length && (
         <div className='mt-5 flex justify-center items-center p-2 text-2xl w-full'>

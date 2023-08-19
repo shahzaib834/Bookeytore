@@ -59,6 +59,9 @@ export class MembersService {
       where: {
         id,
       },
+      include: {
+        RentedBooks: true,
+      },
     });
 
     if (!member) {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useLayoutEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getSingleData } from '../api/GET';
@@ -5,6 +6,7 @@ import { Book } from '../interfaces/Book';
 import useUserAuth from '../hooks/useUserAuth';
 import { postData } from '../api/POST';
 import moment from 'moment';
+import MemberTile from '../components/MemberTile';
 
 interface Comment {
   id: number;
@@ -19,17 +21,7 @@ const Book = () => {
   const userAuth = useUserAuth();
   const [comment, setComment] = useState('');
   const [bookComments, setBookComments] = useState([]);
-  const [book, setBook] = useState<Book>({
-    id: 0,
-    title: '',
-    authorName: '',
-    description: '',
-    rentFee: 0,
-    status: '',
-    comments: [
-      { id: 0, comment: '', memberId: 0, User: { username: '' }, DateTime: '' },
-    ],
-  });
+  const [book, setBook] = useState<Book | undefined>();
   const defaultImage =
     'https://elements-cover-images-0.imgix.net/43a0f94b-abc5-4bc9-98c1-92f72cf03ec0?auto=compress%2Cformat&fit=max&w=1370&s=dfeda277333cef334b9cdddc8d98bcc9';
 
@@ -78,7 +70,7 @@ const Book = () => {
         username: userAuth.user.username || user.username,
         comment,
       };
-      await postData(`books/${book.id}/comment`, data);
+      await postData(`books/${book?.id}/comment`, data);
       setComment('');
       fetchData();
     } catch (err) {
@@ -86,24 +78,66 @@ const Book = () => {
     }
   };
 
+  const unRentBook = async (memberId: number) => {
+    const response = await postData(`books/return-book/${id}/member/${memberId}`);
+
+    if (response.success) {
+      console.log('success');
+    }
+
+    fetchData();
+  };
+
   return (
     <div className='p-6'>
       <div className='flex p-6 gap-6 w-full mt-5'>
         <img src={defaultImage} className='h-96 rounded-lg ' />
         <div>
-          <p className='text-4xl uppercase font-bold'>{book.title}</p>
-          <p className='text-xl font-thin'>{book.description}</p>
-          <p className='text-3xl'>{book.rentFee}$</p>
-          <p className='text-2xl'>{book.authorName}</p>
+          <p className='text-4xl uppercase font-bold'>{book?.title}</p>
+          <p className='text-3xl'>{book?.rentFee}$</p>
+          <p className='text-2xl'>{book?.authorName}</p>
+          <p className='text-2xl'>Total Stock: {book?.stock}</p>
           <p
             className={`text-2xl ${
-              book.status === 'AVAILABLE' ? 'bg-green-900' : 'bg-red-900'
+              book?.status === 'AVAILABLE' ? 'bg-green-900' : 'bg-red-900'
             } px-6 p-2 flex justify-center uppercase rounded-md mt-4`}
           >
-            {book.status}
+            {book?.status}
           </p>
+
+          {book?.status === 'AVAILABLE' && (
+            <div>react select here to select members to rent</div>
+          )}
         </div>
       </div>
+
+      {/* RENT TO MEMBERS SECTION */}
+      {book?.RentedBooks?.length ? (
+        <div className='flex flex-col gap-3'>
+          <p className='text-2xl mt-5'>This Book is rented to:</p>
+          {book?.RentedBooks.map((member) => {
+            return (
+              <div className='flex justify-around mt-5'>
+                {/* @ts-ignore */}
+                <MemberTile
+                  key={member.member.id}
+                  member={member.member}
+                  shortImage={true}
+                />
+                {/* @ts-ignore */}
+                <button
+                  className='p-2 h-11 bg-red-500 self-center rounded-md text-slate-100'
+                  onClick={() => unRentBook(member.member.id)}
+                >
+                  Cancel
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <></>
+      )}
 
       {/* Comments section */}
       <div className='flex flex-col mt-4'>

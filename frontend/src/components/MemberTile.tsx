@@ -4,9 +4,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface MemberTileProps {
   member: Member;
+  shortImage?: boolean;
 }
 
-const MemberTile: React.FC<MemberTileProps> = ({ member }) => {
+const MemberTile: React.FC<MemberTileProps> = ({ member, shortImage }) => {
   const navigate = useNavigate();
 
   const handleMemberClick = () => {
@@ -15,12 +16,14 @@ const MemberTile: React.FC<MemberTileProps> = ({ member }) => {
 
   return (
     <div
-      className='flex flex-col justify-between gap-2 border border-slate-500 p-2 rounded-md cursor-pointer'
+      className={` ${
+        shortImage ? 'w-fit' : ''
+      } flex flex-col justify-between gap-2 border border-slate-500 p-2 rounded-md cursor-pointer`}
       onClick={handleMemberClick}
     >
       <img
         src='https://upittpress.org/wp-content/themes/pittspress/images/no_cover_available.png'
-        className='h-52 w-full rounded-lg '
+        className={`${shortImage ? 'h-28' : 'h-52'} w-full rounded-lg`}
       />
       <div className='flex flex-col gap-1'>
         <p>

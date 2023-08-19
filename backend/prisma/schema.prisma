@@ -32,16 +32,17 @@ model Member {
 }
 
 model Book {
-  id          Int           @id @default(autoincrement())
-  title       String
-  description String
-  authorName  String
-  status      BookStatus    @default(AVAILABLE)
-  rentFee     Int
-  RentedBooks RentedBooks[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  comments    Comment[]
+  id             Int           @id @default(autoincrement())
+  title          String
+  rentedQuantity Int           @default(0)
+  stock          Int           @default(1)
+  authorName     String
+  status         BookStatus    @default(AVAILABLE)
+  rentFee        Int
+  RentedBooks    RentedBooks[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  comments       Comment[]
 }
 
 model Comment {
@@ -68,5 +69,6 @@ model RentedBooks {
 
 enum BookStatus {
   AVAILABLE
-  RENTED
+  ALL_RENTED
+  REMOVED
 }

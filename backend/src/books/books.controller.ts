@@ -58,7 +58,7 @@ export class BooksController {
     return this.booksService.deleteBookById(id);
   }
 
-  @Post('/rent')
+  @Post('/rent/add')
   rentABook(
     @Body(ValidationPipe) rentBookDto: RentBookDto
   ): Promise<{ success: boolean; message: string } | null> {
@@ -73,10 +73,11 @@ export class BooksController {
     return this.booksService.addComment(id, addCommentDto);
   }
 
-  @Put('/return-book/:id')
+  @Post('/return-book/:bookId/member/:memberId')
   returnRentedBook(
-    @Param('id', ParseIntPipe) id: number
+    @Param('bookId', ParseIntPipe) bookId: number,
+    @Param('memberId', ParseIntPipe) memberId: number
   ): Promise<{ success: boolean; message: string }> {
-    return this.booksService.returnRentedBook(id);
+    return this.booksService.returnRentedBook(bookId, memberId);
   }
 }
