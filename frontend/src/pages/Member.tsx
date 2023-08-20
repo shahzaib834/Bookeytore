@@ -1,7 +1,10 @@
+// @ts-nocheck
 import { useLayoutEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getSingleData } from '../api/GET';
 import { Member } from '../interfaces/Member';
+import { postData } from '../api/POST';
+import BookTile from '../components/BookTile';
 
 const Member = () => {
   let { id } = useParams();
@@ -17,6 +20,16 @@ const Member = () => {
   useLayoutEffect(() => {
     fetchData();
   }, []);
+
+  const unRentBook = async (bookId: number) => {
+    const response = await postData(`books/return-book/${bookId}/member/${id}`);
+
+    if (response.success) {
+      console.log('success');
+    }
+
+    fetchData();
+  };
 
   return (
     <div className='p-6'>
@@ -34,12 +47,27 @@ const Member = () => {
         </div>
       </div>
 
-      {/* BOOKS TAKEN */}
-      <div className='mt-5 flex gap-4'>
-        <p>RENTED BOOKS TO RETURN</p>
-
-        <div className='flex flex-col gap-3 p-2'>BOOKS HERE WITH IMAGE AND NAME AND ID AND AUTHOR NAME</div>
-      </div>
+      {/* RENT TO MEMBERS SECTION */}
+      {member?.RentedBooks?.length ? (
+        <div className='flex flex-col gap-3'>
+          <p className='text-2xl mt-5'>This Member has the following books:</p>
+          {member?.RentedBooks.map((book) => {
+            return (
+              <div className='flex justify-around mt-5'>
+                <BookTile key={book.book.id} book={book.book} />
+                <button
+                  className='p-2 h-11 bg-red-500 self-center rounded-md text-slate-100'
+                  onClick={() => unRentBook(book.book.id)}
+                >
+                  Cancel
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
 };

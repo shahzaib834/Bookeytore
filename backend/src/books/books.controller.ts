@@ -8,7 +8,9 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -19,6 +21,7 @@ import { UpdateBookDto } from './dto/update-book.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RentBookDto } from './dto/rent-book.dto';
 import { AddCommentDto } from './dto/add-comment.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('books')
 export class BooksController {
@@ -34,10 +37,12 @@ export class BooksController {
 
   @Post()
   @UsePipes(ValidationPipe)
+  @UseInterceptors(FileInterceptor('image'))
   createBook(
-    @Body(ValidationPipe) createBookDto: CreateBookDto
+    @Body(ValidationPipe) createBookDto: CreateBookDto,
+    @UploadedFile() image: Express.Multer.File
   ): Promise<Book | null> {
-    return this.booksService.createBook(createBookDto);
+    return this.booksService.createBook(createBookDto, image);
   }
 
   @Get('/:id')

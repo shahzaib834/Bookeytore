@@ -60,7 +60,11 @@ export class MembersService {
         id,
       },
       include: {
-        RentedBooks: true,
+        RentedBooks: {
+          include: {
+            book: true,
+          },
+        },
       },
     });
 

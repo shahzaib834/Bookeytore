@@ -10,10 +10,14 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { RentBookDto } from './dto/rent-book.dto';
 import { AddCommentDto } from './dto/add-comment.dto';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class BooksService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private cloudinary: CloudinaryService
+  ) {}
 
   getAllBooks(query: {
     filter: string;
@@ -67,8 +71,17 @@ export class BooksService {
     }
   }
 
-  createBook(createTaskDto: CreateBookDto): Promise<Book | null> {
+  createBook(
+    createTaskDto: CreateBookDto,
+    image: Express.Multer.File
+  ): Promise<Book | null> {
     const { title, rentedQuantity, stock, rentFee, authorName } = createTaskDto;
+
+    // Image Upload
+    const response = this.uploadImageToCloudinary(image);
+    console.log(response);
+
+    return;
 
     return this.prisma.book.create({
       data: {
@@ -296,5 +309,11 @@ export class BooksService {
       console.log(err);
       return { success: false, message: 'comment addition Failed' };
     }
+  }
+
+  async uploadImageToCloudinary(file: Express.Multer.File) {
+    return await this.cloudinary.uploadImage(file).catch(() => {
+      throw new BadRequestException('Invalid file type.');
+    });
   }
 }
