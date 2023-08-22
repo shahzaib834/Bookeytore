@@ -79,7 +79,9 @@ const Book = () => {
   };
 
   const unRentBook = async (memberId: number) => {
-    const response = await postData(`books/return-book/${id}/member/${memberId}`);
+    const response = await postData(
+      `books/return-book/${id}/member/${memberId}`
+    );
 
     if (response.success) {
       console.log('success');
@@ -91,7 +93,10 @@ const Book = () => {
   return (
     <div className='p-6'>
       <div className='flex p-6 gap-6 w-full mt-5'>
-        <img src={defaultImage} className='h-96 rounded-lg ' />
+        <img
+          src={book?.image.url || defaultImage}
+          className='h-96 rounded-lg w-6/12'
+        />
         <div>
           <p className='text-4xl uppercase font-bold'>{book?.title}</p>
           <p className='text-3xl'>{book?.rentFee}$</p>

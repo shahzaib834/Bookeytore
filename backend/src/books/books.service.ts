@@ -71,27 +71,34 @@ export class BooksService {
     }
   }
 
-  createBook(
+  async createBook(
     createTaskDto: CreateBookDto,
     image: Express.Multer.File
   ): Promise<Book | null> {
-    const { title, rentedQuantity, stock, rentFee, authorName } = createTaskDto;
+    try {
+      const { title, rentedQuantity, stock, rentFee, authorName } =
+        createTaskDto;
 
-    // Image Upload
-    const response = this.uploadImageToCloudinary(image);
-    console.log(response);
+      // Image Upload
+      const cloudinaryResponse =
+        image && (await this.uploadImageToCloudinary(image));
 
-    return;
-
-    return this.prisma.book.create({
-      data: {
-        title,
-        rentedQuantity,
-        rentFee,
-        authorName,
-        stock,
-      },
-    });
+      return this.prisma.book.create({
+        data: {
+          title,
+          rentedQuantity,
+          rentFee: 5,
+          authorName,
+          stock,
+          image: {
+            public_id: cloudinaryResponse?.public_id || '',
+            url: cloudinaryResponse?.url || '',
+          },
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getBookById(id: number): Promise<Book | null> {
@@ -312,8 +319,6 @@ export class BooksService {
   }
 
   async uploadImageToCloudinary(file: Express.Multer.File) {
-    return await this.cloudinary.uploadImage(file).catch(() => {
-      throw new BadRequestException('Invalid file type.');
-    });
+    return await this.cloudinary.uploadFile(file);
   }
 }

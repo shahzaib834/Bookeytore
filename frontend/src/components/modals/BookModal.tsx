@@ -32,13 +32,13 @@ const BookModal = () => {
     }, 300);
   }, []);
 
-  //   const handleSubmit = useCallback(() => {
-  //     onSubmit();
-  //   }, [disabled, onSubmit]);
-
   if (!bookModal.isOpen) {
     return null;
   }
+
+  const addBook = async (data: any) => {};
+
+  const updateBook = async () => {};
 
   return (
     <>
@@ -69,7 +69,7 @@ const BookModal = () => {
                   react select here
                 </div>
                 <Input
-                  id='book-name'
+                  id='title'
                   label='title'
                   disabled={false}
                   register={register}
@@ -77,7 +77,7 @@ const BookModal = () => {
                   required
                 />
                 <Input
-                  id='author'
+                  id='authorName'
                   label='author'
                   disabled={false}
                   register={register}
@@ -87,16 +87,27 @@ const BookModal = () => {
                 <Input
                   id='rent-fee'
                   label='rentFee $'
+                  type='number'
                   disabled={false}
                   register={register}
                   errors={errors}
                   required
                 />
                 react select for status
-                <button className='p-2 bg-purple-500 hover:bg-purple-700 text-slate-100 rounded-md'>
+                <div className='flex gap-3'>
+                  <p className='text-lg'>IMAGE -</p>
+                  <input id='image' type='file' {...register('image')} />
+                </div>
+                <button
+                  className='p-2 bg-purple-500 hover:bg-purple-700 text-slate-100 rounded-md'
+                  onClick={handleSubmit(addBook)}
+                >
                   ADD
                 </button>
-                <button className='p-2 bg-purple-500 hover:bg-purple-700 text-slate-100 rounded-md'>
+                <button
+                  className='p-2 bg-purple-500 hover:bg-purple-700 text-slate-100 rounded-md'
+                  onClick={handleSubmit(updateBook)}
+                >
                   UPDATE
                 </button>
               </div>

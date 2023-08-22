@@ -34,7 +34,7 @@ const Member = () => {
   return (
     <div className='p-6'>
       <div className='flex p-6 gap-6 w-full mt-5'>
-        <img src={defaultImage} className='h-96 rounded-lg ' />
+        <img src={defaultImage} className='h-96 rounded-lg w-6/12' />
         <div>
           <p className='text-4xl uppercase font-bold'>{member?.name}</p>
           <p className='text-xl font-thin mt-5'>

@@ -21,7 +21,7 @@ const BookTile: React.FC<BookTileProps> = ({ book }) => {
       className='flex flex-col justify-center gap-2 border border-slate-500 p-2 rounded-md cursor-pointer'
       onClick={handleBookClick}
     >
-      <img src={defaultImage} className='h-52 w-full rounded-lg ' />
+      <img src={book.image.url || defaultImage} className='h-52 w-full rounded-lg ' />
       <div className='flex flex-col gap-1'>
         <p>
           Title: <span>{book.title}</span>

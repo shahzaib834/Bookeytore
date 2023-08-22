@@ -39,6 +39,7 @@ model Book {
   authorName     String
   status         BookStatus    @default(AVAILABLE)
   rentFee        Int
+  image          Json?
   RentedBooks    RentedBooks[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt

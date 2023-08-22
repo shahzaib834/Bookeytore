@@ -7,6 +7,10 @@ export interface Book {
   rentFee: number;
   status: string;
   RentedBooks: [];
+  image: {
+    public_id: string;
+    url: string;
+  };
   comments: [
     {
       id: number;
