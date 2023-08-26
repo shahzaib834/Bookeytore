@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { BACKEND_PORT } from '../constants';
-export const postData = async (path: string, data = {}) => {
+export const updateDataById = async (path: string, id: string, data = {}) => {
   let config = {
-    method: 'post',
-    url: `${BACKEND_PORT}/${path}`,
+    method: 'put',
+    url: `${BACKEND_PORT}/${path}/${id}`,
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${localStorage.getItem('token')}`,

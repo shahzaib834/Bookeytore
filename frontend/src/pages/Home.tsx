@@ -8,6 +8,8 @@ import MemberTile from '../components/MemberTile';
 import { AiOutlineArrowRight, AiOutlineArrowLeft } from 'react-icons/ai';
 import useBookModal from '../hooks/useBookModal';
 import useMemberModal from '../hooks/useMemberModal';
+import BookModal from '../components/modals/BookModal';
+import MemberModal from '../components/modals/MemberModal';
 
 const Home = () => {
   const [data, setData] = useState([]);
@@ -48,6 +50,8 @@ const Home = () => {
 
   return (
     <div>
+      <BookModal refetchData={() => fetchData('books')} />
+      <MemberModal />
       <RadioSection radioOption={radioOption} onChange={onStateChange} />
       {/* Filters Here later */}
 

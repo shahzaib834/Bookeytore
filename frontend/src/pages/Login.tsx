@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useUserAuth from '../hooks/useUserAuth';
 import { useNavigate } from 'react-router-dom';
 import { postData } from '../api/POST';
+import Swal from 'sweetalert2';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -23,6 +24,21 @@ const Login = () => {
       localStorage.setItem('token', response.token);
 
       navigate('/');
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Logged in succesfull',
+        showConfirmButton: false,
+        timer: 1000,
+      });
+    } else {
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: 'Logged in failed',
+        showConfirmButton: false,
+        timer: 1000,
+      });
     }
   };
   return (

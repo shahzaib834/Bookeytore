@@ -1,8 +1,16 @@
 import axios from 'axios';
-export const getData = async (path: string, page: number = 1) => {
+import { BACKEND_PORT } from '../constants';
+export const getData = async (
+  path: string,
+  page: number = 1,
+  limit: number = 10,
+  filter: string = ''
+) => {
+  const urlWithoutlimit = `${BACKEND_PORT}/${path}?page=${page}`;
+  const urlWithlimit = `${BACKEND_PORT}/${path}?page=${page}&limit=${limit}&filter=${filter}`;
   let config = {
     method: 'get',
-    url: `http://localhost:5000/${path}?page=${page}`,
+    url: limit ? urlWithlimit : urlWithoutlimit,
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
     },

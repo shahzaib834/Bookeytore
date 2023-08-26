@@ -1,25 +1,31 @@
 import { BiLogOutCircle } from 'react-icons/bi';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import useUserAuth from '../hooks/useUserAuth';
-import BookModal from './modals/BookModal';
-import MemberModal from './modals/MemberModal';
+import { useEffect } from 'react';
 
 const RootLayout = () => {
   const navigate = useNavigate();
+  const userContext = useUserAuth();
 
   const handleLogout = () => {
     userContext.setUserAuth(false, { username: '' }, '');
     localStorage.setItem('userAuth', 'false');
+    localStorage.setItem('token', '');
     localStorage.setItem('user', JSON.stringify({}));
     navigate('/login');
   };
 
-  const userContext = useUserAuth();
+  useEffect(() => {
+    if (!userContext.userAuth) {
+      navigate('/login');
+      return;
+    }
+  }, []);
+
   return (
     <>
+      {/* navbar */}
       <div className='flex justify-around p-2 border-b-2 border-red-300'>
-        <BookModal />
-        <MemberModal />
         <Link className='cursor-pointer text-2xl' to='/'>
           BookeyTore
         </Link>
