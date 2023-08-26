@@ -7,6 +7,7 @@ import useUserAuth from '../hooks/useUserAuth';
 import { postData } from '../api/POST';
 import moment from 'moment';
 import MemberTile from '../components/MemberTile';
+import useLoader from '../hooks/useLoader';
 
 interface Comment {
   id: number;
@@ -22,6 +23,9 @@ const Book = () => {
   const [comment, setComment] = useState('');
   const [bookComments, setBookComments] = useState([]);
   const [book, setBook] = useState<Book | undefined>();
+
+  const loader = useLoader();
+
   const defaultImage =
     'https://elements-cover-images-0.imgix.net/43a0f94b-abc5-4bc9-98c1-92f72cf03ec0?auto=compress%2Cformat&fit=max&w=1370&s=dfeda277333cef334b9cdddc8d98bcc9';
 
@@ -51,10 +55,12 @@ const Book = () => {
   };
 
   const fetchData = async () => {
+    loader.onOpen();
     const response = await getSingleData('books', id);
     setBook(response);
     console.log(response);
     serializeComments(response.comments);
+    loader.onClose();
   };
 
   useLayoutEffect(() => {
@@ -63,6 +69,7 @@ const Book = () => {
 
   const addComment = async () => {
     try {
+      loader.onOpen();
       // @ts-ignore
       const user = JSON.parse(localStorage.getItem('user'));
       const data = {
@@ -73,19 +80,25 @@ const Book = () => {
       await postData(`books/${book?.id}/comment`, data);
       setComment('');
       fetchData();
+      loader.onClose();
     } catch (err) {
+      loader.onClose();
       console.log(err);
     }
   };
 
   const unRentBook = async (memberId: number) => {
+    loader.onOpen();
     const response = await postData(
       `books/return-book/${id}/member/${memberId}`
     );
 
     if (response.success) {
+      // book unrented
       console.log('success');
     }
+
+    loader.onClose();
 
     fetchData();
   };

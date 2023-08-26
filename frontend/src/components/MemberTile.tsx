@@ -22,7 +22,7 @@ const MemberTile: React.FC<MemberTileProps> = ({ member, shortImage }) => {
       onClick={handleMemberClick}
     >
       <img
-        src='https://upittpress.org/wp-content/themes/pittspress/images/no_cover_available.png'
+        src={member.image.url}
         className={`${shortImage ? 'h-28' : 'h-52'} w-full rounded-lg`}
       />
       <div className='flex flex-col gap-1'>

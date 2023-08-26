@@ -10,6 +10,8 @@ import useBookModal from '../hooks/useBookModal';
 import useMemberModal from '../hooks/useMemberModal';
 import BookModal from '../components/modals/BookModal';
 import MemberModal from '../components/modals/MemberModal';
+import Loader from '../components/Loader';
+import useLoader from '../hooks/useLoader';
 
 const Home = () => {
   const [data, setData] = useState([]);
@@ -19,8 +21,10 @@ const Home = () => {
 
   const bookModal = useBookModal();
   const memberModal = useMemberModal();
+  const loader = useLoader();
 
   const fetchData = async (type: string) => {
+    loader.onOpen();
     const response = await getData(type, page);
     setData(response);
 
@@ -29,6 +33,7 @@ const Home = () => {
     } else {
       setTotalPages(page + 1);
     }
+    loader.onClose();
   };
 
   useEffect(() => {
@@ -50,8 +55,9 @@ const Home = () => {
 
   return (
     <div>
+      <Loader visible={loader.isSpinning} />
       <BookModal refetchData={() => fetchData('books')} />
-      <MemberModal />
+      <MemberModal refetchData={() => fetchData('members')} />
       <RadioSection radioOption={radioOption} onChange={onStateChange} />
       {/* Filters Here later */}
 

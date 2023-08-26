@@ -180,12 +180,19 @@ export class BooksService {
         where: {
           id: memberId,
         },
+        include: {
+          RentedBooks: true,
+        },
       });
 
       if (!member || member.isDefaulter) {
         throw new BadRequestException(
           'Member not found or Member is a defaulter!'
         );
+      }
+
+      if (member.RentedBooks.length >= 3) {
+        throw new BadRequestException('Max books allowed is 3');
       }
 
       await this.prisma.book.update({

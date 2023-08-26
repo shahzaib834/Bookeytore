@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 const RootLayout = () => {
   const navigate = useNavigate();
   const userContext = useUserAuth();
+  const userAuth: boolean = localStorage.getItem('userAuth') === 'true';
 
   const handleLogout = () => {
     userContext.setUserAuth(false, { username: '' }, '');
@@ -16,7 +17,7 @@ const RootLayout = () => {
   };
 
   useEffect(() => {
-    if (!userContext.userAuth) {
+    if (!userAuth) {
       navigate('/login');
       return;
     }

@@ -1,7 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import useUserAuth from '../hooks/useUserAuth';
 function Protected({ children }: { children: any }) {
-  console.log('here');
   const userContext = useUserAuth();
   const userAuth: boolean = localStorage.getItem('userAuth') === 'true';
 

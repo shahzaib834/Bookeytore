@@ -5,16 +5,22 @@ import { getSingleData } from '../api/GET';
 import { Member } from '../interfaces/Member';
 import { postData } from '../api/POST';
 import BookTile from '../components/BookTile';
+import useLoader from '../hooks/useLoader';
 
 const Member = () => {
   let { id } = useParams();
   const [member, setMember] = useState<Member | undefined>();
+
+  const loader = useLoader();
+
   const defaultImage =
     'https://elements-cover-images-0.imgix.net/43a0f94b-abc5-4bc9-98c1-92f72cf03ec0?auto=compress%2Cformat&fit=max&w=1370&s=dfeda277333cef334b9cdddc8d98bcc9';
 
   const fetchData = async () => {
+    loader.onOpen();
     const response = await getSingleData('members', id);
     setMember(response);
+    loader.onClose();
   };
 
   useLayoutEffect(() => {
@@ -22,11 +28,14 @@ const Member = () => {
   }, []);
 
   const unRentBook = async (bookId: number) => {
+    loader.onOpen();
     const response = await postData(`books/return-book/${bookId}/member/${id}`);
 
     if (response.success) {
       console.log('success');
     }
+
+    loader.onClose();
 
     fetchData();
   };

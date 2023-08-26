@@ -23,6 +23,7 @@ model Member {
   id                         Int           @id @default(autoincrement())
   name                       String
   email                      String
+  image                      Json?
   isMonthlySubscribed        Boolean       @default(false)
   monthlySubscriptionEndDate DateTime?
   isDefaulter                Boolean       @default(false)

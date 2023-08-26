@@ -14,6 +14,7 @@ import useDebounce from '../../hooks/useDebounce';
 import { Book } from '../../interfaces/Book';
 import { updateDataById } from '../../api/PUT';
 import Swal from 'sweetalert2';
+import useLoader from '../../hooks/useLoader';
 
 interface BookModalProps {
   refetchData: () => void;
@@ -27,6 +28,7 @@ const statusOptions = [
 
 const BookModal: FC<BookModalProps> = ({ refetchData }) => {
   const bookModal = useBookModal();
+  const loader = useLoader();
   const [showModal, setShowModal] = useState(bookModal.isOpen);
   const [cloudinaryImage, setCloudinaryImage] = useState({
     preview: '',
@@ -43,11 +45,13 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
   const debouncedValue = useDebounce<string>(filter, 500);
 
   const fetchBooks = async () => {
+    loader.onOpen();
     const books = await getData('books', 1, 5, filter);
     const modifiedBooks = books.map((book: Book) => {
       return { value: book.id, label: book.title };
     });
     setBookOptions(modifiedBooks);
+    loader.onClose();
   };
 
   useEffect(() => {
@@ -91,6 +95,7 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
   }
 
   const addBook = async (formData: any) => {
+    loader.onOpen();
     const book = await postData('books', formData);
 
     if (book.id) {
@@ -113,9 +118,11 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
         timer: 1000,
       });
     }
+    loader.onClose();
   };
 
   const updateBook = async (formData: any) => {
+    loader.onOpen();
     const book = await updateDataById('books', selectedBook.value, formData);
 
     if (book.id) {
@@ -138,6 +145,7 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
         timer: 1000,
       });
     }
+    loader.onClose();
   };
 
   const handleImageChange = (e: any) => {
@@ -151,6 +159,7 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
 
   const handleUpload = async (e: any) => {
     e.preventDefault();
+    loader.onOpen();
     const formData = new FormData();
     formData.append('image', cloudinaryImage.raw);
 
@@ -181,6 +190,7 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
         timer: 1000,
       });
     }
+    loader.onClose();
   };
 
   const clearForm = () => {
@@ -199,6 +209,7 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
   };
 
   const handleSelectBook = async (selected: any) => {
+    loader.onOpen();
     const book: Book = await getSingleData('books', selected.value);
     setBookStatus({ label: book.status, value: book.status });
     setValue('title', book.title);
@@ -208,11 +219,12 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
     setCloudinaryImage({ preview: book.image.url, raw: '' });
     setCloudinaryImageUrl(book.image.url);
     setSelectedBook(selected);
+    loader.onClose();
   };
 
   return (
     <>
-      <div className='h-full justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none bg-neutral-800/70'>
+      <div className='h-full justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-40 outline-none focus:outline-none bg-neutral-800/70'>
         <div className='relative w-full md:w-4/6 lg:w-3/6 xl:w-2/5 my-6 mx-auto h-full lg:h-auto md:h-auto'>
           {/* CONTENT */}
           <div

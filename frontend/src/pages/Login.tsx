@@ -3,14 +3,17 @@ import useUserAuth from '../hooks/useUserAuth';
 import { useNavigate } from 'react-router-dom';
 import { postData } from '../api/POST';
 import Swal from 'sweetalert2';
+import Loader from '../components/Loader';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false)
   const userContext = useUserAuth();
   const navigate = useNavigate();
 
   const handleLogin = async () => {
+    setIsLoading(true);
     const user = {
       username: email,
       password,
@@ -40,9 +43,11 @@ const Login = () => {
         timer: 1000,
       });
     }
+    setIsLoading(false);
   };
   return (
     <div className='absolute left-[50%] top-[50%] border p-5 translate-x-[-50%] translate-y-[-50%] w-[50vw] h-[50vh]'>
+      <Loader visible={isLoading} />
       <p className='text-2xl'>Login</p>
       <div className='flex flex-col gap-5 mt-[8vh]'>
         <input

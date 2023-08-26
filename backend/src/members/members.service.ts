@@ -21,7 +21,7 @@ export class MembersService {
     if (!query.filter) {
       return this.prisma.member.findMany({
         skip,
-        take: query.limit,
+        take: Number(query.limit),
         orderBy: {
           createdAt: 'desc',
         },
@@ -29,7 +29,7 @@ export class MembersService {
     } else {
       return this.prisma.member.findMany({
         skip,
-        take: query.limit,
+        take: Number(query.limit),
         orderBy: {
           createdAt: 'desc',
         },
@@ -44,12 +44,16 @@ export class MembersService {
   }
 
   createMember(createMemberDto: CreateMemberDto): Promise<Member | null> {
-    const { name, email } = createMemberDto;
+    const { name, email, image_public_id, image_url } = createMemberDto;
 
     return this.prisma.member.create({
       data: {
         name,
         email,
+        image: {
+          public_id: image_public_id || '',
+          url: image_url || '',
+        },
       },
     });
   }
