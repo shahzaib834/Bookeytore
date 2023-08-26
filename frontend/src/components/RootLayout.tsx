@@ -2,6 +2,7 @@ import { BiLogOutCircle } from 'react-icons/bi';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import useUserAuth from '../hooks/useUserAuth';
 import { useEffect } from 'react';
+import axios from 'axios';
 
 const RootLayout = () => {
   const navigate = useNavigate();
@@ -21,6 +22,19 @@ const RootLayout = () => {
       navigate('/login');
       return;
     }
+
+    axios.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      (error) => {
+        if (error.response.status === 401) {
+          // can check for refresh token here. and that fails then redirect to login
+          navigate('/login');
+        }
+        return error;
+      }
+    );
   }, []);
 
   return (

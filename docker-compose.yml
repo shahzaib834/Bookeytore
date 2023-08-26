@@ -27,15 +27,15 @@ services:
     env_file:
       - .env
 
-  # fe:
-  #   build:
-  #     context: frontend/
-  #     dockerfile: Dockerfile
-  #   container_name: CLIENT_NEW
-  #   environment:
-  #     - PORT=${PORT}
-  #   ports:
-  #     - 5173:5173
+  fe:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    container_name: CLIENT_NEW
+    environment:
+      - PORT=${PORT}
+    ports:
+      - 5173:5173
 
   # pgadmin:
   #   image: dpage/pgadmin4

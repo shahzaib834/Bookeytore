@@ -28,7 +28,7 @@ const Home = () => {
     const response = await getData(type, page);
     setData(response);
 
-    if (response.length < 10) {
+    if (response?.length < 10) {
       setTotalPages(page);
     } else {
       setTotalPages(page + 1);

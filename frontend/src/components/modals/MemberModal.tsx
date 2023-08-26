@@ -162,6 +162,9 @@ const MemberModal: FC<MemberModalProps> = ({ refetchData }) => {
 
     const result = await fetch(`${BACKEND_PORT}/cloudinary`, {
       method: 'POST',
+      headers: new Headers({
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      }),
       body: formData,
     });
 

@@ -47,7 +47,7 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
   const fetchBooks = async () => {
     loader.onOpen();
     const books = await getData('books', 1, 5, filter);
-    const modifiedBooks = books.map((book: Book) => {
+    const modifiedBooks = books?.map((book: Book) => {
       return { value: book.id, label: book.title };
     });
     setBookOptions(modifiedBooks);
@@ -165,6 +165,9 @@ const BookModal: FC<BookModalProps> = ({ refetchData }) => {
 
     const result = await fetch(`${BACKEND_PORT}/cloudinary`, {
       method: 'POST',
+      headers: new Headers({
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      }),
       body: formData,
     });
 

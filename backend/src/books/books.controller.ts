@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
 import { BooksService } from './books.service';
@@ -19,10 +20,10 @@ import { RentBookDto } from './dto/rent-book.dto';
 import { AddCommentDto } from './dto/add-comment.dto';
 
 @Controller('books')
+@UseGuards(AuthGuard)
 export class BooksController {
   constructor(private booksService: BooksService) {}
 
-  // @UseGuards(AuthGuard)
   @Get()
   getAllBooks(
     @Query() query: { filter: string; page: number; limit: number }

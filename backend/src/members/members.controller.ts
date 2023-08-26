@@ -8,6 +8,7 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -15,8 +16,10 @@ import { Member } from '@prisma/client';
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('members')
+@UseGuards(AuthGuard)
 export class MembersController {
   constructor(private membersService: MembersService) {}
 

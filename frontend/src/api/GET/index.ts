@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { BACKEND_PORT } from '../constants';
+
 export const getData = async (
   path: string,
   page: number = 1,
@@ -22,6 +23,7 @@ export const getData = async (
       return response.data;
     })
     .catch(async (error) => {
+      // error.response.status === 401
       return error;
     });
   return response;

@@ -1,13 +1,16 @@
 // @ts-nocheck
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getSingleData } from '../api/GET';
+import { getData, getSingleData } from '../api/GET';
 import { Book } from '../interfaces/Book';
 import useUserAuth from '../hooks/useUserAuth';
 import { postData } from '../api/POST';
 import moment from 'moment';
 import MemberTile from '../components/MemberTile';
 import useLoader from '../hooks/useLoader';
+import Select from 'react-select';
+import useDebounce from '../hooks/useDebounce';
+import Swal from 'sweetalert2';
 
 interface Comment {
   id: number;
@@ -23,11 +26,36 @@ const Book = () => {
   const [comment, setComment] = useState('');
   const [bookComments, setBookComments] = useState([]);
   const [book, setBook] = useState<Book | undefined>();
+  const [memberOptions, setMemberOptions] = useState([]);
+  const [selectedMember, setSelectedMember] = useState({
+    value: '',
+    label: '',
+  });
+  const [filter, setFilter] = useState<string>('');
+  const debouncedValue = useDebounce<string>(filter, 500);
 
   const loader = useLoader();
 
   const defaultImage =
     'https://elements-cover-images-0.imgix.net/43a0f94b-abc5-4bc9-98c1-92f72cf03ec0?auto=compress%2Cformat&fit=max&w=1370&s=dfeda277333cef334b9cdddc8d98bcc9';
+
+  const fetchMembers = async () => {
+    loader.onOpen();
+    const members = await getData('members', 1, 5, filter);
+    const modifiedMembers = members.map((member: Member) => {
+      return { value: member.id, label: member.name };
+    });
+    setMemberOptions(modifiedMembers);
+    loader.onClose();
+  };
+
+  useEffect(() => {
+    const getMembers = async () => {
+      await fetchMembers();
+    };
+
+    getMembers();
+  }, [debouncedValue]);
 
   const serializeComments = (
     comments: [
@@ -58,7 +86,6 @@ const Book = () => {
     loader.onOpen();
     const response = await getSingleData('books', id);
     setBook(response);
-    console.log(response);
     serializeComments(response.comments);
     loader.onClose();
   };
@@ -103,6 +130,40 @@ const Book = () => {
     fetchData();
   };
 
+  const handleKeyDown = async (e: any) => {
+    setFilter(e.target.value);
+  };
+
+  const handleSelectMember = async (selected: any) => {
+    loader.onOpen();
+    const data = {
+      bookId: Number(id),
+      memberId: selected.value,
+    };
+    const response = await postData('books/rent/add', data);
+
+    if (response.success) {
+      setSelectedMember({ value: '', label: '' });
+      fetchData();
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Book rented',
+        showConfirmButton: false,
+        timer: 1000,
+      });
+    } else {
+      Swal.fire({
+        position: 'top-end',
+        icon: 'error',
+        title: 'Book rent Failed',
+        showConfirmButton: false,
+        timer: 1000,
+      });
+    }
+    loader.onClose();
+  };
+
   return (
     <div className='p-6'>
       <div className='flex p-6 gap-6 w-full mt-5'>
@@ -124,7 +185,17 @@ const Book = () => {
           </p>
 
           {book?.status === 'AVAILABLE' && (
-            <div>react select here to select members to rent</div>
+            <div className='mt-3'>
+              <Select
+                options={memberOptions}
+                onChange={(selected: any) => handleSelectMember(selected)}
+                onKeyDown={(e: any) => handleKeyDown(e)}
+                classNames={{
+                  dropdownIndicator: () => 'text-black cursor-pointer',
+                  input: () => 'h-12',
+                }}
+              />
+            </div>
           )}
         </div>
       </div>
