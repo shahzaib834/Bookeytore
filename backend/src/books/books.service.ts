@@ -10,14 +10,10 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { RentBookDto } from './dto/rent-book.dto';
 import { AddCommentDto } from './dto/add-comment.dto';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class BooksService {
-  constructor(
-    private prisma: PrismaService,
-    private cloudinary: CloudinaryService
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
   getAllBooks(query: {
     filter: string;
@@ -31,7 +27,7 @@ export class BooksService {
     if (!query.filter) {
       return this.prisma.book.findMany({
         skip,
-        take: query.limit,
+        take: Number(query.limit),
         orderBy: {
           createdAt: 'desc',
         },
@@ -48,7 +44,7 @@ export class BooksService {
     } else {
       return this.prisma.book.findMany({
         skip,
-        take: query.limit,
+        take: Number(query.limit),
         orderBy: {
           createdAt: 'desc',
         },
@@ -71,28 +67,30 @@ export class BooksService {
     }
   }
 
-  async createBook(
-    createTaskDto: CreateBookDto,
-    image: Express.Multer.File
-  ): Promise<Book | null> {
+  async createBook(createTaskDto: CreateBookDto): Promise<Book | null> {
     try {
-      const { title, rentedQuantity, stock, rentFee, authorName } =
-        createTaskDto;
+      const {
+        title,
+        rentedQuantity,
+        stock,
+        rentFee,
+        authorName,
+        image_public_id,
+        image_url,
+      } = createTaskDto;
 
-      // Image Upload
-      const cloudinaryResponse =
-        image && (await this.uploadImageToCloudinary(image));
+      const rent = typeof rentFee === 'number' ? rentFee : parseInt(rentFee);
 
       return this.prisma.book.create({
         data: {
           title,
           rentedQuantity,
-          rentFee: 5,
+          rentFee: rent,
           authorName,
           stock,
           image: {
-            public_id: cloudinaryResponse?.public_id || '',
-            url: cloudinaryResponse?.url || '',
+            public_id: image_public_id || '',
+            url: image_url || '',
           },
         },
       });
@@ -316,9 +314,5 @@ export class BooksService {
       console.log(err);
       return { success: false, message: 'comment addition Failed' };
     }
-  }
-
-  async uploadImageToCloudinary(file: Express.Multer.File) {
-    return await this.cloudinary.uploadFile(file);
   }
 }

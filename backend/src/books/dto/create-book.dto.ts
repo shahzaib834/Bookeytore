@@ -4,7 +4,7 @@ export class CreateBookDto {
   @IsNotEmpty()
   title: string;
 
-  // @IsNotEmpty()
+  @IsNotEmpty()
   rentFee: number;
 
   @IsNotEmpty()
@@ -12,4 +12,7 @@ export class CreateBookDto {
 
   rentedQuantity: number;
   stock: number;
+
+  image_public_id: string;
+  image_url: string;
 }
