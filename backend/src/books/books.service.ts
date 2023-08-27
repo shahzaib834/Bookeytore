@@ -1,7 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
@@ -10,6 +10,7 @@ import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
 import { RentBookDto } from './dto/rent-book.dto';
 import { AddCommentDto } from './dto/add-comment.dto';
+import moment from 'moment';
 
 @Injectable()
 export class BooksService {
@@ -166,7 +167,19 @@ export class BooksService {
         where: {
           id: bookId,
         },
+        include: {
+          RentedBooks: true,
+        },
       });
+
+      // check if already rented to this user
+      const ifAlreadyBooked = book.RentedBooks.some((rentedBook) => {
+        return rentedBook.bookId === bookId && rentedBook.memberId === memberId;
+      });
+
+      if (ifAlreadyBooked) {
+        throw new HttpException('Already booked by this user!', 400);
+      }
 
       if (
         !book ||
@@ -210,12 +223,13 @@ export class BooksService {
         data: {
           bookId,
           memberId,
+          rentEndDate: new Date(),
         },
       });
       return { success: true, message: 'Book rented succesfully' };
     } catch (err) {
       console.log(err);
-      throw new InternalServerErrorException('Something went wrong!');
+      return { success: false, message: 'Renting book failed' };
     }
   }
 
@@ -272,7 +286,7 @@ export class BooksService {
       return { success: true, message: 'Unrented Successfully' };
     } catch (err) {
       console.log(err);
-      throw new InternalServerErrorException('Something went wrong!');
+      return { success: false, message: err };
     }
   }
 

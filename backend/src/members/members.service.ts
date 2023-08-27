@@ -93,11 +93,11 @@ export class MembersService {
     id: number,
     updateMemberDto: UpdateMemberDto
   ): Promise<Member | null> {
-    const { name, email } = updateMemberDto;
+    const { name, email, isDefaulter, isMonthlySubscribed } = updateMemberDto;
 
     return await this.prisma.member.update({
       where: { id },
-      data: { name, email },
+      data: { name, email, isDefaulter, isMonthlySubscribed },
     });
   }
 
