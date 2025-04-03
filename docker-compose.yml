@@ -4,7 +4,7 @@ services:
     restart: always
     environment:
       - POSTGRES_PASSWORD=postgres
-    container_name: postgres_new
+    container_name: postgres
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     ports:
@@ -17,9 +17,7 @@ services:
     build:
       context: backend/
       dockerfile: Dockerfile
-    container_name: my_api_new
-    environment:
-      - PORT=${PORT}
+    container_name: api
     ports:
       - '5000:5000'
     depends_on:
@@ -27,15 +25,22 @@ services:
     env_file:
       - .env
 
-  fe:
+  react-fe:
     build:
-      context: frontend/
+      context: react-frontend/
       dockerfile: Dockerfile
-    container_name: CLIENT_NEW
-    environment:
-      - PORT=${PORT}
+    container_name: react-frontend
     ports:
       - 5173:5173
+
+
+  vue-fe:
+    build:
+      context: vue-frontend/
+      dockerfile: Dockerfile
+    container_name: vue-frontend
+    ports:
+      - 3000:3000
 
   # pgadmin:
   #   image: dpage/pgadmin4
